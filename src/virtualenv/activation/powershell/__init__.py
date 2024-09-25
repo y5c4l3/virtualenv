@@ -7,6 +7,10 @@ class PowerShellActivator(ViaTemplateActivator):
     def templates(self):
         yield "activate.ps1"
 
+    @staticmethod
+    def quote(string):
+        return f"'{string.replace("'", "''")}'"
+
 
 __all__ = [
     "PowerShellActivator",

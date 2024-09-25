@@ -1,11 +1,32 @@
 from __future__ import annotations
 
 from virtualenv.activation.via_template import ViaTemplateActivator
+import shlex
 
 
 class NushellActivator(ViaTemplateActivator):
     def templates(self):
         yield "activate.nu"
+
+    @staticmethod
+    def quote(string):
+        """
+        Nushell supports raw strings like: r###'this is a string'###
+
+        Find the maximum continuous sharps in the string and then quote it with
+        an extra sharp.
+        """
+        max_sharps = 0
+        current_sharps = 0
+        for char in string:
+            if char == '#':
+                current_sharps += 1
+                if current_sharps > max_sharps:
+                    max_sharps = current_sharps
+            else:
+                current_sharps = 0
+        wrapping = '#' * (max_sharps + 1)
+        return f"r{wrapping}'{string}'{wrapping}"
 
     def replacements(self, creator, dest_folder):  # noqa: ARG002
         return {
